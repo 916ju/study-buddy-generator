@@ -79,12 +79,38 @@ const Index = () => {
   };
 
   const handleSaveImage = async () => {
-    if (!resultRef.current) return;
-    const canvas = await html2canvas(resultRef.current, { backgroundColor: "#fffaf5", scale: 2 });
-    const link = document.createElement("a");
-    link.download = "가짜공부법_결과.png";
-    link.href = canvas.toDataURL();
-    link.click();
+    // 🛑 변경된 부분: resultRef 대신 카드를 직접 캡처하기 위해 cardRef로 바꿉니다.
+    // (아래 2단계에서 이름표 위치를 옮길 거예요.)
+    const cardElement = document.getElementById('result-card');
+    if (!cardElement) return;
+
+    try {
+      const canvas = await html2canvas(cardElement, {
+        useCORS: true,
+        scale: 4,               // 해상도를 더 높여서 쨍하게 만듭니다.
+        backgroundColor: "#ffffff", // 흰색 배경을 강제로 입힙니다.
+        logging: false,
+        
+        // 🛑 핵심 해결 옵션: 애니메이션 레이어를 완벽히 차단합니다.
+        onclone: (clonedDoc) => {
+          const element = clonedDoc.getElementById('result-card');
+          if (element) {
+            element.style.animation = 'none'; // 애니메이션 정지
+            element.style.opacity = '1';       // 불투명도 100% 강제
+            element.style.transform = 'none';   // 위치 이동 제거
+            element.style.filter = 'none';     // 블러 효과 등 제거
+          }
+        }
+      });
+
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "교수님뒷목잡는공부법_결과.png"; // 파일 이름도 멋지게!
+      link.click();
+    } catch (error) {
+      console.error("이미지 저장 중 오류 발생:", error);
+    }
   };
 
   // UI 렌더링 부분 (기존과 동일하지만 상태와 연동됨)
@@ -150,16 +176,24 @@ const Index = () => {
       <h2 className="text-xl font-bold text-center animate-fade-in-up">
         🎓 당신에게 딱 맞는 공부법은?
       </h2>
-      <div ref={resultRef} className="w-full max-w-md">
-        <Card className="p-8 animate-fade-in-up border-2 border-orange-200 bg-white shadow-xl">
+      
+      {/* 🛑 변경된 부분: 
+         1. resultRef를 여기서 뺍니다. 
+         2. id="result-card"를 추가해서 캡처 도구가 이 Card만 인식하게 합니다.
+         3. style로 opacity: 1을 확실히 박아줍니다.
+      */}
+      <div id="result-card" style={{ opacity: 1 }} className="w-full max-w-md animate-fade-in-up">
+        <Card style={{ backgroundColor: 'white' }} className="p-8 border-2 border-orange-200 shadow-xl">
           <div className="text-center">
             <span className="text-5xl mb-4 block">📚</span>
-            <h3 className="text-2xl font-bold text-orange-600 mb-3">{result.title}</h3>
-            <p className="text-foreground text-lg leading-relaxed">{result.desc}</p>
-            <p className="mt-6 text-xs text-muted-foreground border-t pt-4">입력한 특징: {traits}</p>
+            {/* 글자색을 파스텔톤 대신 더 진한 오렌지와 회색으로 변경해서 대비를 높입니다. */}
+            <h3 className="text-2xl font-bold text-[#f97316] mb-3">{result.title}</h3>
+            <p className="text-[#374151] text-lg leading-relaxed font-medium">{result.desc}</p>
+            <p className="mt-6 text-sm text-[#9ca3af] font-semibold border-t pt-4">입력한 특징: {traits}</p>
           </div>
         </Card>
       </div>
+
       <div className="flex gap-3 animate-fade-in-up">
         <Button variant="outline" size="lg" onClick={handleReset} className="border-orange-200 text-orange-600">
           <RotateCcw className="mr-2" size={18} />
