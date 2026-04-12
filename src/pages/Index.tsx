@@ -4,14 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { BookOpen, Sparkles, RotateCcw, Download } from "lucide-react";
 import html2canvas from "html2canvas";
+import { Analytics } from "@vercel/analytics/react";
 
 const STUDY_METHODS = [
-  { keywords: ["철학", "인문", "생각"], title: "데카르트 공부법", desc: "나는 시험 생각을 안 한다. 고로 시험은 존재하지 않는다." },
+  { keywords: ["철학", "인문", "생각", "문과"], title: "데카르트 공부법", desc: "나는 시험 생각을 안 한다. 고로 시험은 존재하지 않는다." },
   { keywords: ["경제", "경영", "돈", "주식"], title: "애덤스미스 공부법", desc: "보이지 않는 손이 대신 시험지를 채워줄 것이다." },
-  { keywords: ["물리", "과학", "공대", "관성"], title: "뉴턴의 관성 공부법", desc: "한 번 누우면 계속 누워 있게 되는 물리 법칙을 이용함." },
+  { keywords: ["물리", "과학", "공대", "관성", "잠", "기계"], title: "뉴턴의 관성 공부법", desc: "한 번 누우면 계속 누워 있게 되는 물리 법칙을 이용함." },
   { keywords: ["컴공", "코딩", "컴퓨터", "개발", "IT"], title: "컴공과 이진법 공부법", desc: "아는 것(1)과 모르는 것(0)을 확실히 구분하려다 0만 남음." },
   { keywords: ["과학", "양자", "슈뢰딩거"], title: "슈뢰딩거의 공부법", desc: "시험지를 열기 전까지 나는 합격과 불합격 상태가 공존한다." },
-  { keywords: ["잠", "졸려", "수면", "조건반사"], title: "파블로프 공부법", desc: "책을 펼치면 자동으로 잠이 오는 조건반사를 완성함." },
+  { keywords: ["잠", "졸려", "수면", "조건반사", "잠자기"], title: "파블로프 공부법", desc: "책을 펼치면 자동으로 잠이 오는 조건반사를 완성함." },
   { keywords: ["과학", "시간", "벼락치기", "상대성"], title: "아인슈타인 상대성 공부법", desc: "시험 전날 밤은 상대적으로 매우 짧다." },
   { keywords: ["생물", "진화", "생명"], title: "다윈 진화론 공부법", desc: "적자생존. 시험에서 살아남은 자만이 졸업한다." },
   { keywords: ["생물", "dna", "생명"], title: "DNA 공부법", desc: "첫눈에 알아본 밥으로 찍음." },
@@ -19,11 +20,11 @@ const STUDY_METHODS = [
   { keywords: ["수학", "통계", "운"], title: "피타고라스 공부법", desc: "성적² = 노력² + 운²  …결국 운이 더 크다." },
   { keywords: ["넷플릭스", "유튜브", "영화", "취미"], title: "타노스 공부법", desc: "반만 외운다." },
   { keywords: ["운동", "헬스", "근육", "체육"], title: "근성장 공부법", desc: "공부도 근성장처럼 휴식이 제일 중요하다며 하루 종일 누워 있음." },
-  { keywords: ["음악", "비트"], title: "4분 쉼표 공부법", desc: "인생이라는 악보에 4분 쉼표를 찍고 고요하게 명상만 함." },
-  { keywords: ["음악", "케이팝", "트와이스"], title: "트와이스 공부법", desc: "원인어밀리언! 시험범위는 백만, 난 그 중에서 하나만 판다." },
+  { keywords: ["음악", "비트", "연주", "드럼", "기타", "피아노", "연주"], title: "4분 쉼표 공부법", desc: "인생이라는 악보에 4분 쉼표를 찍고 고요하게 명상만 함." },
+  { keywords: ["음악", "케이팝", "트와이스", "여돌", "아이돌"], title: "트와이스 공부법", desc: "원인어밀리언! 시험범위는 백만, 난 그 중에서 하나만 판다." },
   { keywords: ["음악", "케이팝", "지드래곤"], title: "지드래곤 공부법", desc: "이번 학기는 삐딱하게 무제 답안지다." },
-  { keywords: ["디자인", "미술", "미대"], title: "누끼 따기 공부법", desc: "시험 범위에서 내가 아는 부분만 누끼 따려다 배경(모르는 것)만 남음." },
-  { keywords: ["심리", "마음", "분석"], title: "독심술 공부법", desc: "공부 대신 교수님의 마음을 읽어본다." },
+  { keywords: ["디자인", "미술", "미대", "그림"], title: "누끼 따기 공부법", desc: "시험 범위에서 내가 아는 부분만 누끼 따려다 배경(모르는 것)만 남음." },
+  { keywords: ["심리", "마음", "분석", "타로"], title: "독심술 공부법", desc: "공부 대신 교수님의 마음을 읽어본다." },
   { keywords: ["게임", "롤", "lol", "리그오브레전드"], title: "점멸 공부법", desc: "D냐 F냐..." },
   { keywords: ["간호", "의학", "응급"], title: "심폐소생술 공부법", desc: "이미 사망한 내 성적에 심폐소생술을 시도하지만 골든타임을 놓침." },
   { keywords: ["법학", "법", "유예"], title: "집행유예 공부법", desc: "이번 학기 성적 처벌을 다음 학기로 유예해달라고 기도함." },
@@ -37,6 +38,22 @@ const STUDY_METHODS = [
   { keywords: ["음악", "노래", "아이유"], title: "아이유 공부법", desc: "손틈새로 비치는 부분만 판다" },
   { keywords: ["음악", "밴드", "데이식스"], title: "데이식스 공부법", desc: "한 페이지만 공부한다." },
   { keywords: ["해양", "통영", "수영"], title: "인어공주 공부법", desc: "Under the C~" },
+  { keywords: ["언어", "의미론", "모호성"], title: "의미론 공부법", desc: "이 문장은 이해한 건지 아닌 건지 애매하다." },
+  { keywords: ["국문", "국어", "한국어", "한글", "책"], title: "통사론 공부법", desc: "문장은 분석했는데 뜻은 모르겠다." },
+  { keywords: ["언어학", "번역", "해석", "영어"], title: "번역학 공부법", desc: "원문도 모르겠고 번역문도 모르겠지만 둘 다 맞는 것 같다." },
+  { keywords: ["교육", "국교", "일교", "영교","학교", "선생"], title: "교직 공부법", desc: "미래의 내가 잘 가르쳐줄 거라 믿고 지금은 안 배운다." },
+  { keywords: ["일어", "일본어", "일문", "일교", "애니"], title: "애니 공부법", desc: "애니는 자막 없이 보는데 시험은 자막 있어도 못 본다。" },
+  { keywords: ["영어", "영문", "영교"], title: "English Major Study Method", desc: "Speaking: fluent. Exam: who are you." },
+  { keywords: ["독어", "독일", "독문"], title: "Deutsch Studium Methode", desc: "명사는 외웠는데 성이 바뀌어서 남이 됐다." },
+  { keywords: ["불어", "불문", "프랑스"], title: "Méthode d'étude (français)", desc: "단어는 외웠는데 남자인지 여자인지 물어본다." },
+  { keywords: ["중국어", "중국", "중문", "중어"], title: "중국어학과 공부법", desc: "같은 말 했는데 성조 틀려서 다른 인생 살게 됐다。" },
+  { keywords: ["드럼", "밴드", "합주"], title: "드럼 공부법", desc: "혼자 연습할 땐 완벽했는데 합주 시작하니까 카운트부터 틀린다." },
+  { keywords: ["기타", "밴드", "합주"], title: "기타 공부법", desc: "집에서는 F코드 됐는데 시험 보니까 손이 낯을 가린다." },
+  { keywords: ["베이스", "밴드", "합주"], title: "베이스 공부법", desc: "연습 다 했는데 합주하면 내가 안 들려서 틀린 건지 맞은 건지 모른다." },
+  { keywords: ["피아노", "밴드", "합주"], title: "피아노 공부법", desc: "양손 연습은 했는데 합주에서는 양쪽 다 배신한다." },
+  { keywords: ["루시", "밴드", "lucy"], title: "루시 공부법", desc: "공부는 관두고 그저 너랑 같이 야식이나 먹는다." },
+  { keywords: ["루시", "밴드", "lucy"], title: "루시 공부법", desc: "머리로는 알아 나의 문제들을..." },
+  { keywords: ["멋사", "멋쟁이사자처럼"], title: "멋사 공부법", desc: "한 마리의 사자처럼 어흥~ 외치고 공부한다." },
   { keywords: ["지우"], title: "지우 공부법", desc: "공부를 안 함....." },
   { keywords: ["경상국립대", "경상대", "지누"], title: "지누 공부법", desc: "지누가 경상대를 부숴주기를 기다림." }
   
@@ -171,6 +188,7 @@ const Index = () => {
   }
 
   return (
+    <>
     <div className="relative flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-8 bg-[#fffaf5]">
       {/* 1. 결과 콘텐츠 (가운데 정렬 유지) */}
       <h2 className="text-xl font-bold text-center animate-fade-in-up">
@@ -212,6 +230,8 @@ const Index = () => {
         </p>
       </footer>
     </div>
+    <Analytics />
+    </>
   );
 }
 
